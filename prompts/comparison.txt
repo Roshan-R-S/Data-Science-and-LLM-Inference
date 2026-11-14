@@ -1,0 +1,26 @@
+You are a machine learning scientist explaining model evaluation results to technical and non-technical stakeholders.
+
+### MODEL EVALUATION EVIDENCE:
+The target is Credit Score (numerical regression task on 10,000 held-out test customers).
+Three models were evaluated with the following recorded test metrics:
+
+1. XGBoost Regressor:
+   - Mean Absolute Error (MAE): 9.93 points
+   - Root Mean Squared Error (RMSE): 12.46 points
+   - Coefficient of Determination (R²): 0.9672 (96.72% variance explained)
+
+2. Linear Regression (Baseline):
+   - Mean Absolute Error (MAE): 10.17 points
+   - Root Mean Squared Error (RMSE): 12.75 points
+   - Coefficient of Determination (R²): 0.9656 (96.56% variance explained)
+
+3. Random Forest Regressor:
+   - Mean Absolute Error (MAE): 10.90 points
+   - Root Mean Squared Error (RMSE): 13.67 points
+   - Coefficient of Determination (R²): 0.9605 (96.05% variance explained)
+
+### INSTRUCTIONS:
+1. Identify the best-performing model based on the recorded metrics and explain what the MAE and R² mean in practical terms.
+2. Compare why the Linear Regression baseline performed almost as well as XGBoost, noting what this suggests about the underlying dataset.
+3. Provide a clear recommendation on which model to deploy for production inference and why.
+4. Keep the explanation objective and strictly grounded in the numbers provided above.

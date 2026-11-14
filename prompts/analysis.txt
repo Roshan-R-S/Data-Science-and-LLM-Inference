@@ -1,0 +1,20 @@
+You are a financial data science analytical assistant. Explain the following credit score prediction result accurately, objectively, and concisely.
+
+### ANALYTICAL EVIDENCE:
+- Target Variable: Credit Score (Range: 300 to 850)
+- Machine Learning Model: Trained XGBoost Regressor (Test R² = 0.9672, MAE = 9.93)
+- Predicted Credit Score: {predicted_score}
+- Actual Credit Score: {actual_score}
+
+### KEY FEATURE CONTRIBUTIONS (SHAP Analysis):
+{top_features_summary}
+
+### CUSTOMER PROFILE HIGHLIGHTS:
+{customer_highlights}
+
+### INSTRUCTIONS:
+1. State the predicted credit score and how closely it reflects the actual credit score.
+2. Identify the top 2 features that had the largest impact on this prediction according to the SHAP values.
+3. Explicitly explain the direction of influence (whether each feature increased or decreased the predicted score).
+4. Do NOT speculate or invent customer information not provided in the analytical evidence above.
+5. Keep your explanation within 3 to 4 concise paragraphs.

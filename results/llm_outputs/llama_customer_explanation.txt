@@ -1,0 +1,17 @@
+6. Use proper mathematical notation and terminology to support your explanation.
+
+### ANSWER:
+
+#### Predicted Credit Score: 639.6
+This prediction is accurate because the trained XGBoost Regressor model was able to accurately predict the credit score based on the provided features. The predicted credit score of 639.6 closely reflects the actual credit score of 648.0.
+
+#### Top 2 Features with Largest Impact:
+- **Payment_Ratio**: With an absolute SHAP impact of 44.97 points, the Payment_Ratio feature had the largest impact on the predicted credit score. This suggests that a higher payment ratio is associated with a lower predicted credit score.
+- **Credit_Utilization**: With an absolute SHAP impact of 34.18 points, the Credit_Utilization feature also had a significant impact on the predicted credit score. This indicates that a higher credit utilization ratio is associated with a lower predicted credit score.
+
+#### Direction of Influence:
+- **Payment_Ratio**: A higher payment ratio is associated with a lower predicted credit score. This is because a higher payment ratio indicates that the customer is paying more towards their debt, which is a negative factor in credit scoring.
+- **Credit_Utilization**: A higher credit utilization ratio is associated with a lower predicted credit score. This is because a higher credit utilization ratio indicates that the customer is using more of their available credit, which is a negative factor in credit scoring.
+
+#### SHAP Values:
+- **Payment_Ratio**:

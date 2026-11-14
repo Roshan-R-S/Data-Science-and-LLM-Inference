@@ -1,0 +1,23 @@
+5. Ensure the explanation is accessible to both technical and non-technical stakeholders.
+
+### MODEL EVALUATION EVIDENCE:
+The target is Credit Score (numerical regression task on 10,000 held-out test customers).
+Three models were evaluated with the following recorded test metrics:
+
+1. XGBoost Regressor:
+   - Mean Absolute Error (MAE): 9.93 points
+   - Root Mean Squared Error (RMSE): 12.46 points
+   - Coefficient of Determination (R²): 0.9672 (96.72% variance explained)
+
+2. Linear Regression (Baseline):
+   - Mean Absolute Error (MAE): 10.17 points
+   - Root Mean Squared Error (RMSE): 12.75 points
+   - Coefficient of Determination (R²): 0.9656 (96.56% variance explained)
+
+3. Random Forest Regressor:
+   - Mean Absolute Error (MAE): 10.90 points
+   - Root Mean Squared Error (RMSE): 13.67 points
+   - Coefficient of Determination (R²): 0.9605 (96.05% variance explained)
+
+### INSTRUCTIONS:
+1. Identify the best-performing model based on the recorded metrics and explain what the MAE and R²

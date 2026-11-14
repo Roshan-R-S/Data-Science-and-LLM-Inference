@@ -1,0 +1,11 @@
+Feature,Mean_Absolute_SHAP,Direction
+Payment_Ratio,44.971282168502796,Positive
+Credit_Utilization,34.18362432418824,Negative
+Cash_Advance_Amount,4.4094722037251755,Negative
+EMI_Count,4.377352303771974,Negative
+Mobile_App_Login,3.125711176910406,Positive
+Card_Age_Months,2.900162817738851,Positive
+International_Transactions,2.72297829256693,Positive
+Credit_Limit,0.40771741388956695,Positive
+Annual_Income,0.23932220797220774,Positive
+Payment_Amount,0.21719814460754444,Positive
