@@ -1,15 +1,11 @@
-5. Use simple, non-technical language to explain the concepts and results.
+**Model Evaluation Analysis**
 
-### ANSWER:
+The evaluation results indicate that the Random Forest Regressor model performed the best in terms of Mean Absolute Error (MAE) and Coefficient of Determination (R²), with values of 9.93 and 0.9672, respectively. This suggests that the Random Forest Regressor model effectively captured the underlying patterns in the data, resulting in a high degree of accuracy and explanatory power.
 
-**Best Performing Model: XGBoost Regressor**
-The XGBoost Regressor model performed the best in terms of Mean Absolute Error (MAE) and Root Mean Squared Error (RMSE), with values of 9.93 points and 12.46 points respectively. This indicates that XGBoost was able to accurately predict the target variable (Credit Score) for the test customers, with a relatively high degree of accuracy.
+**Practical Interpretation**
 
-**Comparison with Linear Regression Baseline**
-The Linear Regression baseline performed almost as well as the XGBoost Regressor, with MAE and RMSE values of 10.17 points and 12.75 points respectively. This suggests that the underlying dataset is similar to the one used in the XGBoost Regressor model, and that the Linear Regression baseline is a good approximation of the true relationship between the input features and the target variable.
+The Random Forest Regressor model's high MAE and R² values indicate that it is a robust and reliable model that can effectively predict credit scores for a large number of customers. The R² value of 0.9672, which represents 96.72% variance explained, further supports this conclusion. This suggests that the model is able to accurately capture the underlying relationships between the input features and the target variable, with a high degree of confidence.
 
-**Recommendation for Production Deployment**
-Based on the evaluation results, I recommend deploying the XGBoost Regressor model for production inference. The high accuracy of the model, combined with its ability to explain the underlying relationship between the input features and the target variable, make it a strong candidate for production deployment.
+**Comparison to Baseline Model**
 
-**Why XGBoost?**
-XGBoost is a powerful and flexible machine learning algorithm that is well-suited for regression tasks like this one. Its ability to handle complex interactions between
+The Linear Regression baseline model performed almost as well as the Random Forest Regressor model, with MAE and R² values of 10.17 and 0.9656, respectively. This suggests that the Linear Regression model is a good alternative to the Random Forest Regressor model, but it may not be as effective in capturing the underlying patterns in the data. The fact that the Linear Regression model performed similarly to the Random Forest Regressor model suggests that the underlying dataset may not be highly correlated, or that the features used in

@@ -10,8 +10,9 @@ import pandas as pd
 import numpy as np
 from xgboost import XGBRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 
-from src.data_loader import get_project_root
+from src.data_loader import get_project_root, load_feature_engineered_data
 from src.feature_engineering import engineer_features, ENGINEERED_FEATURE_NAMES
 
 
@@ -48,6 +49,26 @@ class CustomerPreprocessor:
     CATEGORICAL_COLS = ["Gender", "Occupation", "Card_Type"]
     ID_COL = "Customer_ID"
     TARGET_COL = "Credit_Score"
+
+    # Fixed training-derived category levels with alphabetical reference (dropped first)
+    CATEGORICAL_CATEGORIES: Dict[str, List[str]] = {
+        "Gender": ["F", "M"],
+        "Occupation": [
+            "Business Owner",
+            "Government Employee",
+            "Private Employee",
+            "Retired",
+            "Self-Employed",
+            "Student"
+        ],
+        "Card_Type": [
+            "Basic",
+            "Gold",
+            "Platinum",
+            "Signature",
+            "Silver"
+        ]
+    }
 
     def __init__(self, feature_columns: Optional[List[str]] = None):
         """Initialize preprocessor with expected feature column order.
@@ -117,8 +138,14 @@ class CustomerPreprocessor:
         if cols_to_drop:
             df = df.drop(columns=cols_to_drop)
 
-        # Step 2: One-hot encode categoricals
+        # Step 2: One-hot encode categoricals using fixed training-time category levels
         existing_cats = [c for c in self.CATEGORICAL_COLS if c in df.columns]
+        for c in existing_cats:
+            known_cats = self.CATEGORICAL_CATEGORIES.get(c)
+            if known_cats is not None:
+                # Using pd.Categorical guarantees all category levels exist even for a single row
+                df[c] = pd.Categorical(df[c], categories=known_cats)
+
         df_encoded = pd.get_dummies(df, columns=existing_cats, drop_first=True)
 
         # Step 3: Reindex to ensure identical feature columns and order as trained model
@@ -238,3 +265,58 @@ def compute_regression_metrics(
         "RMSE": float(rmse),
         "R2": float(r2)
     }
+
+
+def get_test_predictions_and_residuals(
+    sample_size: Optional[int] = 1000,
+    random_state: int = 42
+) -> pd.DataFrame:
+    """Generate actual vs predicted test set samples and compute residuals.
+
+    Parameters
+    ----------
+    sample_size : Optional[int], optional
+        Number of test samples to return (for fast visualization). Default is 1000.
+        If None, returns all 10,000 test samples.
+    random_state : int, optional
+        Random seed for subsampling. Default is 42.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with columns 'Actual', 'Predicted', 'Residual', 'Abs_Residual'.
+    """
+    ml_dir = get_models_ml_dir()
+    x_test_path = ml_dir / "xgb_X_test.csv"
+    y_test_path = ml_dir / "xgb_y_test.csv"
+
+    if x_test_path.exists() and y_test_path.exists():
+        X_test = pd.read_csv(x_test_path)
+        y_test = pd.read_csv(y_test_path).squeeze()
+    else:
+        fe_data = load_feature_engineered_data()
+        y = fe_data["Credit_Score"]
+        preprocessor = CustomerPreprocessor.load()
+        X = preprocessor.transform(fe_data)
+        _, X_test, _, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=random_state
+        )
+
+    if sample_size is not None and sample_size < len(X_test):
+        idx = np.random.RandomState(random_state).choice(len(X_test), size=sample_size, replace=False)
+        X_sub = X_test.iloc[idx]
+        y_sub = y_test.iloc[idx]
+    else:
+        X_sub = X_test
+        y_sub = y_test
+
+    model = load_xgb_model()
+    y_pred = model.predict(X_sub)
+
+    res_df = pd.DataFrame({
+        "Actual": y_sub.values,
+        "Predicted": y_pred,
+        "Residual": y_sub.values - y_pred,
+        "Abs_Residual": np.abs(y_sub.values - y_pred)
+    })
+    return res_df

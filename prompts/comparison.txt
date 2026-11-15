@@ -20,7 +20,8 @@ Three models were evaluated with the following recorded test metrics:
    - Coefficient of Determination (R²): 0.9605 (96.05% variance explained)
 
 ### INSTRUCTIONS:
-1. Identify the best-performing model based on the recorded metrics and explain what the MAE and R² mean in practical terms.
-2. Compare why the Linear Regression baseline performed almost as well as XGBoost, noting what this suggests about the underlying dataset.
-3. Provide a clear recommendation on which model to deploy for production inference and why.
-4. Keep the explanation objective and strictly grounded in the numbers provided above.
+1. Do not repeat or echo the background evidence headers verbatim. Begin directly with your analysis and conclusions.
+2. Identify the best-performing model based on the recorded metrics and explain what the MAE (9.93) and R² (0.9672) mean in practical terms.
+3. Compare why the Linear Regression baseline performed almost as well as XGBoost, noting what this suggests about the underlying dataset.
+4. Provide a clear recommendation on which model to deploy for production inference and why.
+5. Keep the explanation objective, structured, and strictly grounded in the numbers provided above.

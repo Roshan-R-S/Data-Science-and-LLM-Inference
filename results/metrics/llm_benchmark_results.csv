@@ -1,5 +1,5 @@
 model,task,latency_sec,tokens_generated,tokens_per_sec,word_count,factual_score,numeric_accuracy,composite_quality,rating
-llama,customer_explanation,7.096,300,42.28,228,1.0,1.0,1.0,High
-llama,model_comparison,6.729,300,44.58,217,0.0,0.8,0.44,Low
-qwen,customer_explanation,9.132,300,32.85,200,1.0,1.0,1.0,High
-qwen,model_comparison,8.646,300,34.7,141,0.0,1.0,0.5,Moderate
+llama,customer_explanation,7.257,300,41.34,242,1.0,1.0,1.0,High
+llama,model_comparison,7.252,300,41.37,227,0.467,0.556,0.6,Moderate
+qwen,customer_explanation,9.766,300,30.72,198,1.0,1.0,1.0,High
+qwen,model_comparison,9.226,300,32.52,183,0.6,1.0,0.8,High

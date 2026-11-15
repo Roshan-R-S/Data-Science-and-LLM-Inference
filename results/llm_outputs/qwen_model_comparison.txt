@@ -1,23 +1,7 @@
-5. Ensure the explanation is accessible to both technical and non-technical stakeholders.
+The best-performing model based on the recorded metrics is the XGBoost Regressor, with a Mean Absolute Error (MAE) of 9.93 points and a Root Mean Squared Error (RMSE) of 12.46 points. The Coefficient of Determination (R²) of 0.9672 indicates that 96.72% of the variance in the target variable (Credit Score) is explained by the model. This suggests that the XGBoost model is highly accurate in predicting the Credit Score, with a very low error rate.
 
-### MODEL EVALUATION EVIDENCE:
-The target is Credit Score (numerical regression task on 10,000 held-out test customers).
-Three models were evaluated with the following recorded test metrics:
+The Linear Regression (Baseline) model, with a MAE of 10.17 points and an RMSE of 12.75 points, also performs well, with an R² of 0.9656, indicating 96.56% of the variance in the target variable is explained. This suggests that the Linear Regression model is also quite accurate, with a low error rate.
 
-1. XGBoost Regressor:
-   - Mean Absolute Error (MAE): 9.93 points
-   - Root Mean Squared Error (RMSE): 12.46 points
-   - Coefficient of Determination (R²): 0.9672 (96.72% variance explained)
+The Random Forest Regressor, with a MAE of 10.90 points and an RMSE of 13.67 points, also performs well, with an R² of 0.9605, indicating 96.05% of the variance in the target variable is explained. This model is also highly accurate, with a low error rate.
 
-2. Linear Regression (Baseline):
-   - Mean Absolute Error (MAE): 10.17 points
-   - Root Mean Squared Error (RMSE): 12.75 points
-   - Coefficient of Determination (R²): 0.9656 (96.56% variance explained)
-
-3. Random Forest Regressor:
-   - Mean Absolute Error (MAE): 10.90 points
-   - Root Mean Squared Error (RMSE): 13.67 points
-   - Coefficient of Determination (R²): 0.9605 (96.05% variance explained)
-
-### INSTRUCTIONS:
-1. Identify the best-performing model based on the recorded metrics and explain what the MAE and R²
+The Linear Regression baseline performed almost as well as XG

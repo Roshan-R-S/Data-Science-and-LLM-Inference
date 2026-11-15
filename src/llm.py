@@ -141,41 +141,89 @@ class LocalLLMManager:
             return True
         return self.start_server(target_model)
 
+    def format_chat_prompt(
+        self,
+        user_prompt: str,
+        system_prompt: str = "You are a concise financial data science expert. Answer directly and objectively without repeating background prompt headers.",
+        model_key: Optional[str] = None
+    ) -> str:
+        """Wrap prompt with the model's native Instruct chat template.
+
+        Parameters
+        ----------
+        user_prompt : str
+            The query or evidence prompt.
+        system_prompt : str
+            System instructions for persona and constraints.
+        model_key : str, optional
+            'llama' or 'qwen'. If None, uses self.current_model.
+
+        Returns
+        -------
+        str
+            Properly delimited prompt for instruction-tuned models.
+        """
+        active_model = model_key or self.current_model or "llama"
+
+        if "qwen" in active_model.lower():
+            # Qwen 2.5 ChatML format
+            return (
+                f"<|im_start|>system\n{system_prompt}<|im_end|>\n"
+                f"<|im_start|>user\n{user_prompt}<|im_end|>\n"
+                f"<|im_start|>assistant\n"
+            )
+        else:
+            # Llama 3.2 Instruct format
+            return (
+                f"<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n"
+                f"{system_prompt}<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n"
+                f"{user_prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+            )
+
     def generate(
         self,
         prompt: str,
-        max_tokens: int = 256,
+        system_prompt: Optional[str] = None,
+        max_tokens: int = 512,
         temperature: float = 0.2,
-        request_timeout: int = 120
+        request_timeout: int = 120,
+        apply_template: bool = True
     ) -> Dict[str, Any]:
         """Send completion request to llama-server and record latency metrics.
 
         Parameters
         ----------
         prompt : str
-            Full formatted prompt string.
+            User query or task prompt string.
+        system_prompt : str, optional
+            Custom system instructions.
         max_tokens : int, optional
-            Maximum tokens to generate (n_predict). Default is 256.
+            Maximum tokens to generate (n_predict). Default is 512.
         temperature : float, optional
             Sampling temperature. Default is 0.2.
         request_timeout : int, optional
             HTTP request timeout in seconds. Default is 120.
+        apply_template : bool, optional
+            Whether to format with model's native Instruct chat delimiters. Default is True.
 
         Returns
         -------
         Dict[str, Any]
-            Dictionary containing:
-            - 'content': generated text string
-            - 'tokens_predicted': count of generated tokens
-            - 'latency_seconds': total elapsed wall time
-            - 'tokens_per_second': throughput rate
-            - 'model': active model key
+            Dictionary containing content, tokens_predicted, latency_seconds, tokens_per_second.
         """
         if not self.is_server_ready():
             raise ConnectionError(f"Server is not active or ready at {self.base_url}")
 
+        if apply_template:
+            final_prompt = self.format_chat_prompt(
+                user_prompt=prompt,
+                system_prompt=system_prompt or "You are a concise financial data science expert. Answer directly and objectively without repeating background prompt headers."
+            )
+        else:
+            final_prompt = prompt
+
         payload = {
-            "prompt": prompt,
+            "prompt": final_prompt,
             "n_predict": max_tokens,
             "temperature": temperature
         }
@@ -199,6 +247,7 @@ class LocalLLMManager:
         return {
             "content": content,
             "tokens_predicted": tokens_predicted,
+            "tokens_generated": tokens_predicted,
             "latency_seconds": round(elapsed, 3),
             "tokens_per_second": round(tps, 2),
             "model": self.current_model

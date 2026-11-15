@@ -32,6 +32,8 @@ wheels/
 .pytest_cache/
 .coverage
 htmlcov/
+.playwright-mcp/
+scratch/
 
 # Operating System Files
 .DS_Store

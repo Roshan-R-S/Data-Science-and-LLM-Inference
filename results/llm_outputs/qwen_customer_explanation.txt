@@ -1,14 +1,14 @@
-6. Use bullet points for clarity.
+The predicted credit score of 639.6 closely reflects the actual credit score of 648.0. This is due to the high R² value of 0.9672, indicating that the model has a strong predictive power. The MAE of 9.93 suggests that the model's predictions are relatively close to the actual values, with an average error of 9.93 points.
 
-### ANALYSIS:
-The predicted credit score of 639.6 is significantly higher than the actual credit score of 648.0. This indicates that the model is overestimating the credit score. The SHAP analysis shows that two features had the largest impact on this prediction: Payment_Ratio and Credit_Utilization. 
+The top 2 features that had the largest impact on this prediction according to the SHAP values are:
 
-- **Payment_Ratio**: This feature has a positive SHAP impact of 44.97 points, which means that a higher Payment_Ratio (indicating better payment history) is associated with a higher predicted credit score.
-- **Credit_Utilization**: This feature has a negative SHAP impact of 34.18 points, which means that a higher Credit_Utilization (indicating higher debt levels) is associated with a lower predicted credit score.
+1. **Payment Ratio**: The absolute SHAP impact of 44.97 points is positive, indicating that a higher payment ratio (i.e., lower payment ratio) is associated with a higher predicted credit score. This suggests that having a lower ratio of payments to income is beneficial for the credit score.
 
-The other features have relatively smaller impacts:
-- **Cash_Advance_Amount**: A negative impact of 4.41 points suggests that higher cash advance amounts are associated with a lower predicted credit score.
-- **EMI_Count**: A negative impact of 4.38 points indicates that more EMIs (monthly payments) are associated with a lower predicted credit score.
-- **Mobile_App_Login**: A positive impact of 3.13 points suggests that more mobile app logins are associated with a higher predicted credit score.
+2. **Credit Utilization**: The absolute SHAP impact of -34.18 points is negative, indicating that a higher credit utilization (i.e., higher credit utilization) is associated with a lower predicted credit score. This suggests that having a lower ratio of outstanding balance to income is beneficial for the credit score.
 
-In summary, the model is overestimating the credit score due to the higher Payment_Ratio and Credit
+The other features have smaller impacts:
+- **Cash_Advance_Amount**: -4.41 points (negative impact)
+- **EMI_Count**: -4.38 points (negative impact)
+- **Mobile_App_Login**: 3.13 points (positive impact)
+
+The customer profile highlights include

@@ -86,3 +86,38 @@ def test_llm_manager_model_paths():
 
     with pytest.raises(ValueError):
         manager.get_model_path("non_existent_model")
+
+
+def test_evaluate_factual_consistency_model_comparison():
+    """Test task-specific factual consistency scoring for model comparison."""
+    good_comp = (
+        "The XGBoost Regressor is the top-performing model with the lowest MAE of 9.93 "
+        "and highest R2 of 0.9672. The Linear Regression baseline achieved a competitive "
+        "MAE of 10.17, while Random Forest achieved an MAE of 10.90."
+    )
+    res_good = evaluate_factual_consistency(good_comp, task="model_comparison")
+    assert res_good["task"] == "model_comparison"
+    assert res_good["correct_winner_identified"] is True
+    assert len(res_good["cited_models"]) == 3
+    assert res_good["factual_consistency_score"] >= 0.8
+
+    # Hallucinated model comparison: falsely asserts Random Forest is the best
+    bad_comp = (
+        "The evaluation results indicate that the Random Forest Regressor model performed the best "
+        "in terms of Mean Absolute Error (MAE) and R2. XGBoost and Linear Regression followed behind."
+    )
+    res_bad = evaluate_factual_consistency(bad_comp, task="model_comparison")
+    assert res_bad["correct_winner_identified"] is False
+    assert res_bad["factual_consistency_score"] < res_good["factual_consistency_score"]
+
+
+def test_llm_manager_response_contract():
+    """Verify that LocalLLMManager format_chat_prompt formats templates for both llama and qwen."""
+    manager = LocalLLMManager()
+    llama_prompt = manager.format_chat_prompt("Hello", model_key="llama")
+    assert "<|start_header_id|>system<|end_header_id|>" in llama_prompt
+    assert "<|eot_id|>" in llama_prompt
+
+    qwen_prompt = manager.format_chat_prompt("Hello", model_key="qwen")
+    assert "<|im_start|>system" in qwen_prompt
+    assert "<|im_end|>" in qwen_prompt

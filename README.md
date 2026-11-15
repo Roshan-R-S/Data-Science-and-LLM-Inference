@@ -34,7 +34,7 @@ This project bridges three major disciplines in modern applied AI:
 2. **Explainable AI (XAI)**: Quantifying global feature importance and individual prediction waterfall attributions using SHAP.
 3. **Local LLM Inference & Evaluation**: Deploying quantized instruction-tuned LLMs (`Llama 3.2 1B` and `Qwen 2.5 1.5B`) on local GPU runtimes via `llama.cpp` and evaluating their analytical explanations against numerical ground truth.
 
-The system is encapsulated within a modular Python codebase, a 20-test automated test suite, and an interactive **Streamlit** analytical dashboard.
+The system is encapsulated within a modular Python codebase, a 32-test automated test suite, and an interactive **Streamlit** analytical dashboard.
 
 ---
 
@@ -125,14 +125,15 @@ The project uses a synthetic credit-card customer dataset stored at:
 
 ### Processing Dimensions Matrix:
 
-| Stage | Rows | Columns | Description |
-|---|---:|---:|---|
-| **Raw dataset** | 50,000 | 30 | Original customer records |
-| **Cleaned dataset** | 50,000 | 30 | Deduplicated and range-verified |
-| **Feature-engineered dataset** | 50,000 | 34 | +4 domain spending and utilisation ratios |
-| **Encoded model matrix ($X$)** | 50,000 | 39 | 10 one-hot dummies (`Gender`, `Occupation`, `Card_Type`) |
+| Stage                          |   Rows | Columns | Description                                              |
+| ------------------------------ | -----: | ------: | -------------------------------------------------------- |
+| **Raw dataset**                | 50,000 |      30 | Original customer records                                |
+| **Cleaned dataset**            | 50,000 |      30 | Deduplicated and range-verified                          |
+| **Feature-engineered dataset** | 50,000 |      34 | +4 domain spending and utilisation ratios                |
+| **Encoded model matrix ($X$)** | 50,000 |      39 | 10 one-hot dummies (`Gender`, `Occupation`, `Card_Type`) |
 
 ### Key Metadata:
+
 - **Target Variable**: `Credit_Score` (Range: 300 to 850)
 - **Identifier**: `Customer_ID`
 - **Predictive features**: 28 in raw dataset $\rightarrow$ 32 after feature engineering $\rightarrow$ 39 after one-hot encoding
@@ -146,13 +147,14 @@ The project uses a synthetic credit-card customer dataset stored at:
 
 Three regression algorithms were trained on the identical 80/20 train/test split (`random_state=42`):
 
-| Algorithm | MAE | RMSE | R² Score | Key Role |
-|---|---:|---:|---:|---|
-| **XGBoost Regressor** | **9.93** | **12.46** | **0.9672** | **Production Champion** |
-| Linear Regression | 10.17 | 12.75 | 0.9656 | High-performing baseline |
-| Random Forest Regressor | 10.90 | 13.67 | 0.9605 | Non-linear ensemble |
+| Algorithm               |      MAE |      RMSE |   R² Score | Key Role                 |
+| ----------------------- | -------: | --------: | ---------: | ------------------------ |
+| **XGBoost Regressor**   | **9.93** | **12.46** | **0.9672** | **Production Champion**  |
+| Linear Regression       |    10.17 |     12.75 |     0.9656 | High-performing baseline |
+| Random Forest Regressor |    10.90 |     13.67 |     0.9605 | Non-linear ensemble      |
 
 ### Saved Preprocessing & Model Artifacts:
+
 ```text
 models/ml/
 ├── xgb_model.json           # Trained XGBoost weights & booster configuration
@@ -170,13 +172,13 @@ Model interpretability was performed using `shap.Explainer` (PermutationExplaine
 
 ### Top Feature Drivers:
 
-| Feature Name | Mean Absolute SHAP | Direction | Analytical Meaning |
-|---|---:|---|---|
-| **`Payment_Ratio`** | **44.97 pts** | **Positive** | Higher payment ratios substantially elevate credit scores. |
-| **`Credit_Utilization`** | **34.18 pts** | **Negative** | Heavy credit utilisation heavily penalises credit scores. |
-| `Cash_Advance_Amount` | 4.41 pts | Negative | Cash advances signal credit distress. |
-| `EMI_Count` | 4.38 pts | Negative | High ongoing debt commitments lower creditworthiness. |
-| `Mobile_App_Login` | 3.13 pts | Positive | Engaged customer digital activity associates with lower risk. |
+| Feature Name             | Mean Absolute SHAP | Direction    | Analytical Meaning                                            |
+| ------------------------ | -----------------: | ------------ | ------------------------------------------------------------- |
+| **`Payment_Ratio`**      |      **44.97 pts** | **Positive** | Higher payment ratios substantially elevate credit scores.    |
+| **`Credit_Utilization`** |      **34.18 pts** | **Negative** | Heavy credit utilisation heavily penalises credit scores.     |
+| `Cash_Advance_Amount`    |           4.41 pts | Negative     | Cash advances signal credit distress.                         |
+| `EMI_Count`              |           4.38 pts | Negative     | High ongoing debt commitments lower creditworthiness.         |
+| `Mobile_App_Login`       |           3.13 pts | Positive     | Engaged customer digital activity associates with lower risk. |
 
 Saved visualizations and CSVs are located under `results/figures/` and `results/`.
 
@@ -184,21 +186,31 @@ Saved visualizations and CSVs are located under `results/figures/` and `results/
 
 ## Local LLM Inference & Benchmarking
 
-The project deploys compact GGUF instruction-tuned models locally via `llama.cpp` (`runtime/llama-cuda/llama-server.exe`):
+The project deploys compact GGUF instruction-tuned models locally via `llama.cpp` (`runtime/llama-cuda/llama-server.exe`) on dedicated CUDA GPU hardware:
 
+- **Deployment Hardware**: NVIDIA GeForce RTX 4050 Laptop GPU (6,141 MiB VRAM), Driver 621.24
 - **Meta Llama 3.2 1B Instruct** (`Llama-3.2-1B-Instruct-Q4_K_M.gguf` — 0.75 GB)
 - **Qwen 2.5 1.5B Instruct** (`qwen2.5-1.5b-instruct-q4_k_m.gguf` — 1.04 GB)
 
-### Comparative Benchmark Results:
+### Verified Benchmark Results:
 
-| Model | Task | Latency | Throughput | Factual Consistency | Numerical Accuracy | Quality Score | Rating |
-|---|---|---:|---:|---:|---:|---:|---|
-| **Llama 3.2 1B** | Customer Explanation | **7.10 s** | **42.28 t/s** | **1.00** | **1.00** | **1.00** | **High** |
-| **Qwen 2.5 1.5B** | Customer Explanation | 9.13 s | 32.85 t/s | **1.00** | **1.00** | **1.00** | **High** |
-| **Llama 3.2 1B** | Model Comparison | **6.73 s** | **44.58 t/s** | 0.00 | 0.80 | 0.44 | Low |
-| **Qwen 2.5 1.5B** | Model Comparison | 8.65 s | 34.70 t/s | 0.00 | **1.00** | 0.50 | Moderate |
+#### 1. Systematic Batch Evaluation Benchmark (300-token fixed generation):
 
-*Benchmark artifacts are persisted in `results/metrics/llm_benchmark_results.csv` and `results/llm_outputs/`.*
+| Model             | Task                 |    Latency | Benchmark Throughput | Factual Consistency | Numerical Accuracy | Quality Score | Rating   |
+| ----------------- | -------------------- | ---------: | -------------------: | ------------------: | -----------------: | ------------: | -------- |
+| **Llama 3.2 1B**  | Customer Explanation | **7.26 s** |        **41.34 t/s** |            **1.00** |           **1.00** |      **1.00** | **High** |
+| **Qwen 2.5 1.5B** | Customer Explanation |     9.77 s |            30.72 t/s |            **1.00** |           **1.00** |      **1.00** | **High** |
+| **Llama 3.2 1B**  | Model Comparison     | **7.25 s** |        **41.37 t/s** |                0.47 |               0.56 |          0.60 | Moderate |
+| **Qwen 2.5 1.5B** | Model Comparison     |     9.23 s |            32.52 t/s |            **0.60** |           **1.00** |      **0.80** | **High** |
+
+#### 2. Interactive Real-Time Inference Performance (Streamlit UI & API):
+
+- **Meta Llama 3.2 1B Instruct**: **45.1 – 50.8 tokens/sec** (Server spin-up: 3.55s, response latency: 0.69 – 1.08s for 50–60 tokens).
+- **Qwen 2.5 1.5B Instruct**: **38.2 – 43.1 tokens/sec** (Server spin-up: 2.57s, response latency: 0.80 – 3.92s for 60–150 tokens).
+
+_Note on Throughput Variation: Higher interactive throughput (48–51 t/s) vs. batch benchmarks (31–41 t/s) is expected: shorter conversational generations take advantage of GPU boost clocks and lower KV-cache memory overhead._
+
+_Benchmark artifacts are persisted in `results/metrics/llm_benchmark_results.csv` and `results/llm_outputs/`._
 
 ---
 
@@ -269,7 +281,8 @@ data-science-llm-inference/
 ├── tests/
 │   ├── test_validation.py            # Quality check unit tests
 │   ├── test_cleaning.py              # Cleaning unit tests
-│   ├── test_modeling.py              # Preprocessing & model reproduction unit tests
+│   ├── test_modeling.py              # Preprocessing, residual & model reproduction unit tests
+│   ├── test_explainability.py        # SHAP attribution & live explanation unit tests
 │   ├── test_llm.py                   # Deterministic evaluation unit tests
 │   └── test_integration.py          # End-to-end pipeline integration tests
 │
@@ -282,36 +295,40 @@ data-science-llm-inference/
 
 ## Technology Stack
 
-| Category | Tools & Libraries |
-|---|---|
-| **Programming Language** | Python 3.10 |
-| **Data Manipulation** | Pandas, NumPy |
-| **Data Visualisation** | Matplotlib, Seaborn |
-| **Machine Learning** | Scikit-learn, XGBoost, Joblib |
-| **Explainable AI (XAI)** | SHAP (PermutationExplainer) |
-| **Local LLMs** | Meta Llama 3.2 1B Instruct, Qwen 2.5 1.5B Instruct (GGUF Q4_K_M) |
-| **Inference Engine** | `llama.cpp` (CUDA-accelerated) |
-| **Interactive Dashboard** | Streamlit |
-| **Testing & CI** | Pytest (20 automated tests) |
+| Category                  | Tools & Libraries                                                |
+| ------------------------- | ---------------------------------------------------------------- |
+| **Programming Language**  | Python 3.10                                                      |
+| **Data Manipulation**     | Pandas, NumPy                                                    |
+| **Data Visualisation**    | Matplotlib, Seaborn                                              |
+| **Machine Learning**      | Scikit-learn, XGBoost, Joblib                                    |
+| **Explainable AI (XAI)**  | SHAP (TreeExplainer & PermutationExplainer)                      |
+| **Local LLMs**            | Meta Llama 3.2 1B Instruct, Qwen 2.5 1.5B Instruct (GGUF Q4_K_M) |
+| **Inference Engine**      | `llama.cpp` (CUDA-accelerated)                                   |
+| **Interactive Dashboard** | Streamlit                                                        |
+| **Testing & CI**          | Pytest (32 automated tests)                                      |
 
 ---
 
 ## Getting Started
 
 ### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/<your-username>/data-science-llm-inference.git
 cd data-science-llm-inference
 ```
 
 ### 2. Activate Virtual Environment
+
 PowerShell:
+
 ```powershell
 py -3.10 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
 ### 3. Install Dependencies
+
 ```bash
 python -m pip install --upgrade pip
 pip install -r requirements.txt
@@ -322,28 +339,32 @@ pip install -r requirements.txt
 ## Running the Streamlit Application
 
 Launch the dashboard:
+
 ```powershell
 streamlit run app/streamlit_app.py
 ```
 
 Features available in the application:
-1. **Data Explorer**: View raw, cleaned, and feature-engineered datasets.
-2. **Data Quality**: Execute live validation checks.
-3. **EDA Dashboard**: Interactive distribution and correlation plots.
-4. **ML Predictions**: Input customer parameters to receive real-time credit score predictions.
-5. **Explainability**: Explore global SHAP importance and customer waterfall charts.
-6. **LLM Explanations**: Inspect pre-generated explanations or trigger live CUDA inference.
-7. **Model Comparison**: Side-by-side performance tables for ML and LLM models.
+
+1. **Data Explorer**: View raw, cleaned, and feature-engineered datasets with target distribution and customer identifier cardinality checks.
+2. **Data Quality & Preparation**: Live validation checks, cleaning changes audit, mathematical formulas for all 4 engineered features, and one-hot encoding architecture.
+3. **EDA Dashboard**: Target correlations, bivariate scatter plots, feature distributions, and skewness analysis without causal conflation.
+4. **ML Workbench**: Real-time customer prediction, multi-model evaluation benchmarks, documented credit tiers, and residual analysis.
+5. **Explainable AI (XAI)**: Global SHAP importance, direction impact, reference waterfall plots, and live SHAP explanations for custom customer inputs.
+6. **LLM Analytical Playground**: Interactive local inference for Llama 3.2 1B and Qwen 2.5 1.5B with editable prompts, evidence injection, and sampling controls.
+7. **LLM Evaluation & Benchmarking**: Systematic comparative benchmark table, performance charts, deterministic scoring rubrics, and cold-start vs inference latency analysis.
 
 ---
 
 ## Running Unit and Integration Tests
 
 Run the full automated test suite:
+
 ```powershell
-pytest tests/ -v
+python -m pytest tests/ -v
 ```
-All 20 tests validate data cleaning, range checks, preprocessing alignment, model reproducibility, and deterministic LLM evaluation scoring.
+
+All 32 tests validate data cleaning, range checks, single-row categorical alignment, model reproducibility, portable SHAP reconstruction, and deterministic LLM evaluation scoring.
 
 ---
 
@@ -356,7 +377,7 @@ All 20 tests validate data cleaning, range checks, preprocessing alignment, mode
 - [x] Phase 3: Prompt engineering & local LLM benchmarking completed.
 - [x] Phase 3: Notebook 08 updated with modular evaluation pipeline.
 - [x] Phase 4: Streamlit interactive application implemented.
-- [x] Phase 5: End-to-end integration test suite implemented (20/20 passing).
+- [x] Phase 5: End-to-end integration test suite implemented (32/32 passing).
 - [x] Phase 6: Documentation and metrics verified.
 
 ---

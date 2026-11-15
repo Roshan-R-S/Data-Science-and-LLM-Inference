@@ -11,6 +11,7 @@ from src.modeling import (
     load_xgb_model,
     predict_credit_score,
     compute_regression_metrics,
+    get_test_predictions_and_residuals,
     get_models_ml_dir
 )
 
@@ -85,3 +86,82 @@ def test_model_reproducibility():
     assert pytest.approx(metrics["MAE"], abs=1e-3) == 9.9335
     assert pytest.approx(metrics["RMSE"], abs=1e-3) == 12.4552
     assert pytest.approx(metrics["R2"], abs=1e-4) == 0.9672
+
+
+def test_get_test_predictions_and_residuals():
+    """Verify residual generation and structure."""
+    df = get_test_predictions_and_residuals(sample_size=200)
+    assert len(df) == 200
+    assert set(df.columns) == {"Actual", "Predicted", "Residual", "Abs_Residual"}
+    # Residuals mean should be close to 0
+    assert abs(df["Residual"].mean()) < 5.0
+    # Abs residual mean should be close to MAE (~9.9)
+    assert 7.0 < df["Abs_Residual"].mean() < 13.0
+
+
+def test_single_row_categorical_encoding(raw_customer_sample):
+    """Verify that single-record categorical inputs activate exact dummy columns."""
+    preprocessor = CustomerPreprocessor.load()
+
+    # 1. Test Gender M vs F
+    cust_m = raw_customer_sample.copy()
+    cust_m["Gender"] = "M"
+    X_m = preprocessor.transform(cust_m)
+    assert X_m["Gender_M"].iloc[0] == 1.0
+
+    cust_f = raw_customer_sample.copy()
+    cust_f["Gender"] = "F"
+    X_f = preprocessor.transform(cust_f)
+    assert X_f["Gender_M"].iloc[0] == 0.0
+
+    # 2. Test Occupation encoding
+    cust_occ = raw_customer_sample.copy()
+    cust_occ["Occupation"] = "Self-Employed"
+    X_occ = preprocessor.transform(cust_occ)
+    assert X_occ["Occupation_Self-Employed"].iloc[0] == 1.0
+    assert X_occ["Occupation_Private Employee"].iloc[0] == 0.0
+    assert X_occ["Occupation_Government Employee"].iloc[0] == 0.0
+
+    # Reference Occupation (Business Owner) should have all occupation dummies as 0.0
+    cust_ref_occ = raw_customer_sample.copy()
+    cust_ref_occ["Occupation"] = "Business Owner"
+    X_ref_occ = preprocessor.transform(cust_ref_occ)
+    occ_dummies = [c for c in X_ref_occ.columns if c.startswith("Occupation_")]
+    assert all(X_ref_occ[c].iloc[0] == 0.0 for c in occ_dummies)
+
+    # 3. Test Card_Type encoding
+    cust_card = raw_customer_sample.copy()
+    cust_card["Card_Type"] = "Platinum"
+    X_card = preprocessor.transform(cust_card)
+    assert X_card["Card_Type_Platinum"].iloc[0] == 1.0
+    assert X_card["Card_Type_Gold"].iloc[0] == 0.0
+
+    # 4. Test Unknown Category handles safely without error
+    cust_unk = raw_customer_sample.copy()
+    cust_unk["Occupation"] = "Astronaut"
+    cust_unk["Card_Type"] = "Diamond"
+    X_unk = preprocessor.transform(cust_unk)
+    assert X_unk.shape == (1, 39)
+    assert all(X_unk[c].iloc[0] == 0.0 for c in occ_dummies)
+
+
+def test_batch_vs_single_row_consistency():
+    """Verify that batch transform and single-row transform produce identical feature values."""
+    from src.data_loader import load_raw_data
+
+    raw_batch = load_raw_data(nrows=5)
+    preprocessor = CustomerPreprocessor.load()
+
+    batch_transformed = preprocessor.transform(raw_batch)
+
+    for i in range(len(raw_batch)):
+        single_row = raw_batch.iloc[[i]].to_dict(orient="records")[0]
+        single_transformed = preprocessor.transform(single_row)
+
+        np.testing.assert_allclose(
+            batch_transformed.iloc[i].values,
+            single_transformed.iloc[0].values,
+            rtol=1e-5,
+            atol=1e-5,
+            err_msg=f"Discrepancy between batch and single-row transform for row {i}"
+        )
